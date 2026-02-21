@@ -1,0 +1,19 @@
+apiVersion: selfservice.ovh/v1alpha1
+kind: Database
+metadata:
+  name: demo-postgres-db
+  namespace: default
+spec:
+  parameters:
+    storageGB: 20
+    engine: postgres
+    version: "13"
+  compositionRef:
+    name: database-postgres-ovh
+  writeConnectionSecretsToRef:
+    vaultRef:
+      name: vault-backend
+      property: credentials 
+      key: client/postgres-connection
+      namespace: crossplane-system
+

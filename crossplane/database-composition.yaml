@@ -1,0 +1,53 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: database-postgres-ovh
+spec:
+  writeConnectionSecretsToRef:
+    namespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: selfservice.ovh/v1alpha1
+    kind: Database
+  resources:
+    - name: databaseinstance
+      base:
+        apiVersion: cloud.ovh.upbound.io/v1alpha1
+        kind: DatabaseInstance
+        spec:
+          forProvider:
+            engine: "{{ .parameters.engine }}"
+            version: "{{ .parameters.version }}"
+            plan: essential  
+            region: GRA11  
+            flavorName: db1-4  
+            storageSize: "{{ .parameters.storageGB }}"
+            serviceName: ""  
+          providerConfigRef:
+            name: default
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.labels
+          toFieldPath: metadata.labels
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.storageGB
+          toFieldPath: spec.forProvider.storageSize
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.engine
+          toFieldPath: spec.forProvider.engine
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.version
+          toFieldPath: spec.forProvider.version
+    - name: databaseuser
+      base:
+        apiVersion: cloud.ovh.upbound.io/v1alpha1
+        kind: DatabaseUser
+        spec:
+          forProvider:
+            serviceName: ""  
+            name: admin
+          providerConfigRef:
+            name: default
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.parameters.engine
+          toFieldPath: spec.forProvider.engine

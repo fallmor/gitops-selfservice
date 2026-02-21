@@ -1,0 +1,84 @@
+
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: external-secrets
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.external-secrets.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: external-secrets
+  namespace: flux-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: external-secrets
+      sourceRef:
+        kind: HelmRepository
+        name: external-secrets
+        namespace: flux-system
+      version: ">=0.9.0"
+  targetNamespace: external-secrets
+  install:
+    createNamespace: true
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    installCRDs: true
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: hashicorp
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://helm.releases.hashicorp.com
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vault
+  namespace: flux-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: vault
+      sourceRef:
+        kind: HelmRepository
+        name: hashicorp
+        namespace: flux-system
+      version: ">=0.27.0"
+  targetNamespace: external-secrets
+  install:
+    createNamespace: false  
+  values:
+    server:
+      dev:
+        enabled: true
+  dependsOn:
+    - name: external-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: vault-eso
+  namespace: flux-system
+spec:
+  path: ./gitops-selfservice/vault-eso
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: selfservice-gitops
+  validation: client
+  dependsOn:
+    - name: external-secrets
+    - name: vault

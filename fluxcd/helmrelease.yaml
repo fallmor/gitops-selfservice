@@ -1,0 +1,52 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: crossplane-stable
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.crossplane.io/stable
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: crossplane
+  namespace: flux-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: crossplane
+      sourceRef:
+        kind: HelmRepository
+        name: crossplane-stable
+        namespace: flux-system
+      version: ">=1.14.0"
+  values:
+    args:
+      - "--enable-external-secret-stores"
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crossplane-resources
+  namespace: flux-system
+spec:
+  interval: 5m
+  path: ./gitops-selfservice/crossplane
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: selfservice-gitops
+  validation: client
+  dependsOn:
+    - name: crossplane

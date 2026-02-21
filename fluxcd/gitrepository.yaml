@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: gitops-selfservice
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/mfall/gitops-selfservice
+  ref:
+    branch: main
