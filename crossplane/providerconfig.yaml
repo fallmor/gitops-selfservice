@@ -1,11 +1,12 @@
-apiVersion: ovh.upbound.io/v1alpha1
+apiVersion: ovh.upbound.io/v1
 kind: ProviderConfig
 metadata:
   name: default
+  namespace: crossplane-system
 spec:
   credentials:
     source: Secret
     secretRef:
       namespace: crossplane-system
       name: ovh-secret
-      key: credentials  
+      key: credentials   
