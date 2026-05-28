@@ -1,0 +1,100 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: aidatabase-postgres-ovh
+  labels:
+    provider: ovh
+    engine: postgres
+    ai: claude
+spec:
+  compositeTypeRef:
+    apiVersion: selfservice.ovh/v1alpha1
+    kind: AIDatabase
+  mode: Pipeline
+  pipeline:
+
+    # ── Step 1: Claude AI recommends infrastructure sizing ───────────────────
+    - step: ai-recommend-sizing
+      functionRef:
+        name: function-claude
+      input:
+        apiVersion: claude.fn.upbound.io/v1alpha1
+        kind: Prompt
+        modelName: claude-opus-4-7
+        systemPrompt: |
+          You are a database infrastructure expert for OVHcloud.
+          Given a workload description, recommend optimal PostgreSQL sizing.
+          Reply ONLY with valid JSON — no explanation, no markdown:
+          {
+            "storageGB": <integer, 20-2000>,
+            "plan": "<essential|business|enterprise>",
+            "flavorName": "<db1-4|db1-7|db1-15|db1-30>",
+            "reasoning": "<one sentence>"
+          }
+          Rules:
+          - essential  → low traffic, dev/staging, storageGB <= 100
+          - business   → production, moderate load, storageGB <= 500
+          - enterprise → high availability, heavy load, storageGB > 500
+        userPrompt: |
+          Workload description: {{ .Composite.spec.parameters.workloadDescription }}
+      credentials:
+        - name: claude
+          source: Secret
+          secretRef:
+            namespace: crossplane-system
+            name: claude
+
+    # ── Step 2: Standard patch-and-transform to build the OVH resource ──────
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: databaseinstance
+            base:
+              apiVersion: cloud.ovh.upbound.io/v1alpha1
+              kind: DatabaseInstance
+              spec:
+                forProvider:
+                  engine: postgres
+                  region: GRA11
+                  serviceName: ""
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.engine
+                toFieldPath: spec.forProvider.engine
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.version
+                toFieldPath: spec.forProvider.version
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.storageGB
+                toFieldPath: spec.forProvider.storageSize
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.plan
+                toFieldPath: spec.forProvider.plan
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.flavorName
+                toFieldPath: spec.forProvider.flavorName
+
+          - name: databaseuser
+            base:
+              apiVersion: cloud.ovh.upbound.io/v1alpha1
+              kind: DatabaseUser
+              spec:
+                forProvider:
+                  name: admin
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.engine
+                toFieldPath: spec.forProvider.engine
+
+    # ── Step 3: Auto-ready — composite becomes Ready when DB is Ready ────────
+    - step: auto-ready
+      functionRef:
+        name: function-auto-ready
