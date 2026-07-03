@@ -23,9 +23,9 @@ spec:
                 forProvider:
                   engine: postgres
                   version: "16"
-                  plan: essential
-                  flavor: db1-4
-                  diskSize: 20
+                  plan: discovery
+                  flavor: b3-8
+                  diskSize: 10
                   nodes:
                     - region: GRA
                 providerConfigRef:
@@ -38,8 +38,11 @@ spec:
                 fromFieldPath: spec.parameters.version
                 toFieldPath: spec.forProvider.version
               - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.storageGB
-                toFieldPath: spec.forProvider.diskSize
+                fromFieldPath: spec.parameters.plan
+                toFieldPath: spec.forProvider.plan
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.flavor
+                toFieldPath: spec.forProvider.flavor
 
           - name: databaseuser
             base:

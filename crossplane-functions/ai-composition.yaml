@@ -26,15 +26,14 @@ spec:
           Given a workload description, recommend optimal PostgreSQL sizing.
           Reply ONLY with valid JSON — no explanation, no markdown:
           {
-            "storageGB": <integer, 20-2000>,
-            "plan": "<essential|business|enterprise>",
-            "flavorName": "<db1-4|db1-7|db1-15|db1-30>",
+            "storageGB": <integer, 10-500>,
+            "plan": "<discovery|production>",
+            "flavorName": "<b3-8|b3-16>",
             "reasoning": "<one sentence>"
           }
           Rules:
-          - essential  → low traffic, dev/staging, storageGB <= 100
-          - business   → production, moderate load, storageGB <= 500
-          - enterprise → high availability, heavy load, storageGB > 500
+          - discovery  → 1 node, low traffic, dev/staging, storageGB <= 50
+          - production → 2 nodes, high availability, production workloads, storageGB > 50
         userPrompt: |
           Workload description: {{ .Composite.spec.parameters.workloadDescription }}
       credentials:

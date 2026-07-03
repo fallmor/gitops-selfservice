@@ -5,7 +5,7 @@ metadata:
 spec:
   group: selfservice.ovh
   names:
-    kind: Database  
+    kind: Database
     plural: databases
   versions:
   - name: v1alpha1
@@ -21,9 +21,6 @@ spec:
               parameters:
                 type: object
                 properties:
-                  storageGB:
-                    type: integer
-                    default: 20
                   engine:
                     type: string
                     default: postgres
@@ -32,9 +29,20 @@ spec:
                       - mysql
                   version:
                     type: string
-                    default: "13"
+                    default: "16"
+                  plan:
+                    type: string
+                    default: discovery
+                    enum:
+                      - discovery
+                      - production
+                  flavor:
+                    type: string
+                    default: b3-8
+                    enum:
+                      - b3-8
+                      - b3-16
                 required:
-                  - storageGB
                   - engine
                   - version
             required:

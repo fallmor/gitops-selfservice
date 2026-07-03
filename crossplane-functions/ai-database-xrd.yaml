@@ -50,19 +50,16 @@ spec:
                       default: 20
                     plan:
                       type: string
-                      default: essential
+                      default: discovery
                       enum:
-                        - essential
-                        - business
-                        - enterprise
+                        - discovery
+                        - production
                     flavorName:
                       type: string
-                      default: db1-4
+                      default: b3-8
                       enum:
-                        - db1-4
-                        - db1-7
-                        - db1-15
-                        - db1-30
+                        - b3-8
+                        - b3-16
                   required:
                     - workloadDescription
                     - engine
