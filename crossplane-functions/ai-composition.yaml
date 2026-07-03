@@ -24,16 +24,9 @@ spec:
         systemPrompt: |
           You are a database infrastructure expert for OVHcloud.
           Given a workload description, recommend optimal database sizing.
-          Reply ONLY with valid JSON — no explanation, no markdown:
-          {
-            "storageGB": <integer, 10-500>,
-            "plan": "<discovery|production>",
-            "flavorName": "<b3-8|b3-16>",
-            "reasoning": "<one sentence>"
-          }
-          Rules:
-          - discovery  → 1 node, low traffic, dev/staging, storageGB <= 50
-          - production → 2 nodes, high availability, production workloads, storageGB > 50
+          CRITICAL: output ONLY a raw JSON object. No markdown, no backticks, no code fences, no explanation. Start your response with { and end with }.
+          Required format: {"storageGB":<integer 10-500>,"plan":"<discovery|production>","flavorName":"<b3-8|b3-16>","reasoning":"<one sentence>"}
+          Rules: discovery=1 node dev/staging; production=2 nodes high availability.
         userPrompt: |
           Here is the composite resource as JSON: {{ .Composite }}
           Extract the workloadDescription from spec.parameters and recommend optimal database sizing.
