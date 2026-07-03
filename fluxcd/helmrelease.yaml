@@ -54,7 +54,7 @@ metadata:
   name: crossplane-resources
   namespace: flux-system
 spec:
-  suspend: true
+  suspend: false
   interval: 5m
   path: ./crossplane
   prune: true
@@ -72,7 +72,7 @@ metadata:
   name: crossplane-functions
   namespace: flux-system
 spec:
-  suspend: true
+  suspend: false
   interval: 5m
   path: ./crossplane-functions
   prune: true
@@ -90,7 +90,7 @@ metadata:
   name: apps-resources
   namespace: flux-system
 spec:
-  suspend: true
+  suspend: false
   interval: 5m
   path: ./apps
   prune: true
