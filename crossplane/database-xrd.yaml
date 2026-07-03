@@ -23,9 +23,9 @@ spec:
                 properties:
                   engine:
                     type: string
-                    default: postgres
+                    default: postgresql
                     enum:
-                      - postgres
+                      - postgresql
                       - mysql
                   version:
                     type: string

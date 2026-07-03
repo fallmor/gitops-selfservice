@@ -21,7 +21,7 @@ spec:
               kind: ProjectDatabase
               spec:
                 forProvider:
-                  engine: postgres
+                  engine: postgresql
                   version: "16"
                   plan: discovery
                   flavor: b3-8
@@ -51,7 +51,7 @@ spec:
               kind: ProjectDatabaseUser
               spec:
                 forProvider:
-                  engine: postgres
+                  engine: postgresql
                   name: admin
                   serviceName: "4835abd389014831a84994db5635fc1a"
                   clusterIdSelector:

@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   parameters:
-    engine: postgres
+    engine: postgresql
     version: "16"
     plan: discovery
     flavor: b3-8
