@@ -59,9 +59,10 @@ spec:
                 forProvider:
                   engine: postgres
                   version: "16"
-                  plan: essential
-                  flavor: db1-4
-                  diskSize: 20
+                  plan: discovery
+                  flavor: b3-8
+                  diskSize: 10
+                  serviceName: "4835abd389014831a84994db5635fc1a"
                   nodes:
                     - region: GRA
                 providerConfigRef:
@@ -91,6 +92,7 @@ spec:
                 forProvider:
                   engine: postgres
                   name: admin
+                  serviceName: "4835abd389014831a84994db5635fc1a"
                   clusterIdSelector:
                     matchControllerRef: true
                 providerConfigRef:
