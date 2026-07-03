@@ -6,3 +6,5 @@ metadata:
 spec:
   package: xpkg.upbound.io/edixos/provider-ovh:v2.13.2
   packagePullPolicy: IfNotPresent
+  runtimeConfigRef:
+    name: provider-ovh-runtime

@@ -10,11 +10,6 @@ spec:
   compositeTypeRef:
     apiVersion: selfservice.ovh/v1alpha1
     kind: AIDatabase
-  environment:
-    environmentConfigs:
-      - type: Reference
-        ref:
-          name: ovh-config
   mode: Pipeline
   pipeline:
 
@@ -56,11 +51,6 @@ spec:
       input:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
-        environment:
-          environmentConfigs:
-            - type: Reference
-              ref:
-                name: ovh-config
         resources:
           - name: databaseinstance
             base:
@@ -93,9 +83,6 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.flavorName
                 toFieldPath: spec.forProvider.flavor
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: projectId
-                toFieldPath: spec.forProvider.serviceName
 
           - name: databaseuser
             base:
@@ -113,9 +100,6 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.engine
                 toFieldPath: spec.forProvider.engine
-              - type: FromEnvironmentFieldPath
-                fromFieldPath: projectId
-                toFieldPath: spec.forProvider.serviceName
 
     # ── Step 3: Auto-ready — composite becomes Ready when DB is Ready ────────
     - step: auto-ready

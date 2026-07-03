@@ -1,0 +1,18 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-ovh-runtime
+spec:
+  deploymentTemplate:
+    spec:
+      selector: {}
+      template:
+        spec:
+          containers:
+            - name: package-runtime
+              env:
+                - name: OVH_CLOUD_PROJECT_SERVICE
+                  valueFrom:
+                    secretKeyRef:
+                      name: ovh-project
+                      key: projectId
