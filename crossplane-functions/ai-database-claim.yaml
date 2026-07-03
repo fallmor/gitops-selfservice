@@ -17,6 +17,3 @@ spec:
       Needs high availability. Data must be retained for 3 years.
   compositionRef:
     name: aidatabase-postgres-ovh
-  writeConnectionSecretsToRef:
-    name: shop-postgres-conn
-    namespace: default

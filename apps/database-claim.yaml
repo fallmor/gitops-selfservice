@@ -11,6 +11,3 @@ spec:
     flavor: b3-8
   compositionRef:
     name: database-postgres-ovh
-  writeConnectionSecretsToRef:
-    name: demo-postgres-db-connection
-    namespace: default
