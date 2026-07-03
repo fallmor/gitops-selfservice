@@ -24,8 +24,6 @@ spec:
         namespace: crossplane-system
       version: ">=1.14.0"
   values:
-    args:
-      - --enable-environment-configs
     resources:
       limits:
         cpu: 1000m
