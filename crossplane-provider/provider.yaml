@@ -4,5 +4,5 @@ metadata:
   name: provider-ovh
   namespace: crossplane-system
 spec:
-  package: xpkg.upbound.io/edixos/provider-ovh:latest
+  package: xpkg.upbound.io/edixos/provider-ovh:v2.13.2
   packagePullPolicy: IfNotPresent
