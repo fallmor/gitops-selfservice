@@ -10,6 +10,11 @@ spec:
   compositeTypeRef:
     apiVersion: selfservice.ovh/v1alpha1
     kind: AIDatabase
+  environment:
+    environmentConfigs:
+      - type: Reference
+        ref:
+          name: ovh-config
   mode: Pipeline
   pipeline:
 
@@ -51,16 +56,25 @@ spec:
       input:
         apiVersion: pt.fn.crossplane.io/v1beta1
         kind: Resources
+        environment:
+          environmentConfigs:
+            - type: Reference
+              ref:
+                name: ovh-config
         resources:
           - name: databaseinstance
             base:
-              apiVersion: cloud.ovh.upbound.io/v1alpha1
-              kind: DatabaseInstance
+              apiVersion: databases.ovh.edixos.io/v1alpha1
+              kind: ProjectDatabase
               spec:
                 forProvider:
                   engine: postgres
-                  region: GRA11
-                  serviceName: ""
+                  version: "16"
+                  plan: essential
+                  flavor: db1-4
+                  diskSize: 20
+                  nodes:
+                    - region: GRA
                 providerConfigRef:
                   name: default
             patches:
@@ -72,27 +86,36 @@ spec:
                 toFieldPath: spec.forProvider.version
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.storageGB
-                toFieldPath: spec.forProvider.storageSize
+                toFieldPath: spec.forProvider.diskSize
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.plan
                 toFieldPath: spec.forProvider.plan
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.flavorName
-                toFieldPath: spec.forProvider.flavorName
+                toFieldPath: spec.forProvider.flavor
+              - type: FromEnvironmentFieldPath
+                fromFieldPath: projectId
+                toFieldPath: spec.forProvider.serviceName
 
           - name: databaseuser
             base:
-              apiVersion: cloud.ovh.upbound.io/v1alpha1
-              kind: DatabaseUser
+              apiVersion: databases.ovh.edixos.io/v1alpha1
+              kind: ProjectDatabaseUser
               spec:
                 forProvider:
+                  engine: postgres
                   name: admin
+                  clusterIdSelector:
+                    matchControllerRef: true
                 providerConfigRef:
                   name: default
             patches:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.engine
                 toFieldPath: spec.forProvider.engine
+              - type: FromEnvironmentFieldPath
+                fromFieldPath: projectId
+                toFieldPath: spec.forProvider.serviceName
 
     # ── Step 3: Auto-ready — composite becomes Ready when DB is Ready ────────
     - step: auto-ready

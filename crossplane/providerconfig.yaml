@@ -1,4 +1,4 @@
-apiVersion: ovh.upbound.io/v1
+apiVersion: ovh.edixos.io/v1beta1
 kind: ProviderConfig
 metadata:
   name: default
