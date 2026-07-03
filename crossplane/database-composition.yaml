@@ -25,7 +25,7 @@ spec:
                   version: "16"
                   plan: discovery
                   flavor: b3-8
-                  diskSize: 10
+                  diskSize: 160
                   serviceName: "4835abd389014831a84994db5635fc1a"
                   nodes:
                     - region: GRA
