@@ -39,6 +39,7 @@ metadata:
   name: crossplane-provider
   namespace: flux-system
 spec:
+  suspend: true
   interval: 5m
   path: ./crossplane-provider
   prune: true
@@ -53,6 +54,7 @@ metadata:
   name: crossplane-resources
   namespace: flux-system
 spec:
+  suspend: true
   interval: 5m
   path: ./crossplane
   prune: true
@@ -67,12 +69,34 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: crossplane-functions
+  namespace: flux-system
+spec:
+  suspend: true
+  interval: 5m
+  path: ./crossplane-functions
+  prune: true
+  dependsOn:
+    - name: crossplane-resources
+      namespace: flux-system
+  sourceRef:
+    kind: GitRepository
+    name: gitops-selfservice
+    namespace: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: apps-resources
   namespace: flux-system
 spec:
+  suspend: true
   interval: 5m
   path: ./apps
   prune: true
+  dependsOn:
+    - name: crossplane-resources
+      namespace: flux-system
   sourceRef:
     kind: GitRepository
     name: gitops-selfservice

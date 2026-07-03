@@ -11,9 +11,6 @@ spec:
   compositionRef:
     name: database-postgres-ovh
   writeConnectionSecretsToRef:
-    vaultRef:
-      name: vault-backend
-      property: credentials 
-      key: client/postgres-connection
-      namespace: crossplane-system
+    name: demo-postgres-db-connection
+    namespace: default
 

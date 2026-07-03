@@ -41,6 +41,9 @@ spec:
                       enum:
                         - postgres
                         - mysql
+                    version:
+                      type: string
+                      default: "16"
                     # These are set by the Claude function — devs can omit them
                     storageGB:
                       type: integer
@@ -52,6 +55,14 @@ spec:
                         - essential
                         - business
                         - enterprise
+                    flavorName:
+                      type: string
+                      default: db1-4
+                      enum:
+                        - db1-4
+                        - db1-7
+                        - db1-15
+                        - db1-30
                   required:
                     - workloadDescription
                     - engine

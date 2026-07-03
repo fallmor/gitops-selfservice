@@ -20,7 +20,7 @@ spec:
       input:
         apiVersion: claude.fn.upbound.io/v1alpha1
         kind: Prompt
-        modelName: claude-opus-4-7
+        modelName: claude-sonnet-4-6
         systemPrompt: |
           You are a database infrastructure expert for OVHcloud.
           Given a workload description, recommend optimal PostgreSQL sizing.

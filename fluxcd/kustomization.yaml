@@ -4,4 +4,3 @@ resources:
   - namspace.yaml
   - gitrepository.yaml
   - helmrelease.yaml
-  - vault-eso-helmreleases.yaml
