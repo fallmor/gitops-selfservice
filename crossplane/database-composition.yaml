@@ -6,46 +6,54 @@ spec:
   compositeTypeRef:
     apiVersion: selfservice.ovh/v1alpha1
     kind: Database
-  resources:
-    - name: databaseinstance
-      base:
-        apiVersion: databases.ovh.edixos.io/v1alpha1
-        kind: ProjectDatabase
-        spec:
-          forProvider:
-            engine: postgres
-            version: "16"
-            plan: essential
-            flavor: db1-4
-            diskSize: 20
-            nodes:
-              - region: GRA
-          providerConfigRef:
-            name: default
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.parameters.engine
-          toFieldPath: spec.forProvider.engine
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.parameters.version
-          toFieldPath: spec.forProvider.version
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.parameters.storageGB
-          toFieldPath: spec.forProvider.diskSize
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: databaseinstance
+            base:
+              apiVersion: databases.ovh.edixos.io/v1alpha1
+              kind: ProjectDatabase
+              spec:
+                forProvider:
+                  engine: postgres
+                  version: "16"
+                  plan: essential
+                  flavor: db1-4
+                  diskSize: 20
+                  nodes:
+                    - region: GRA
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.engine
+                toFieldPath: spec.forProvider.engine
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.version
+                toFieldPath: spec.forProvider.version
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.storageGB
+                toFieldPath: spec.forProvider.diskSize
 
-    - name: databaseuser
-      base:
-        apiVersion: databases.ovh.edixos.io/v1alpha1
-        kind: ProjectDatabaseUser
-        spec:
-          forProvider:
-            engine: postgres
-            name: admin
-            clusterIdSelector:
-              matchControllerRef: true
-          providerConfigRef:
-            name: default
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.parameters.engine
-          toFieldPath: spec.forProvider.engine
+          - name: databaseuser
+            base:
+              apiVersion: databases.ovh.edixos.io/v1alpha1
+              kind: ProjectDatabaseUser
+              spec:
+                forProvider:
+                  engine: postgres
+                  name: admin
+                  clusterIdSelector:
+                    matchControllerRef: true
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.parameters.engine
+                toFieldPath: spec.forProvider.engine
