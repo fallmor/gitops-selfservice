@@ -3,8 +3,6 @@ kind: Composition
 metadata:
   name: database-postgres-ovh
 spec:
-  writeConnectionSecretsToRef:
-    namespace: crossplane-system
   environment:
     environmentConfigs:
       - type: Reference
