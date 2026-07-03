@@ -45,20 +45,3 @@ spec:
                 fromFieldPath: spec.parameters.flavor
                 toFieldPath: spec.forProvider.flavor
 
-          - name: databaseuser
-            base:
-              apiVersion: databases.ovh.edixos.io/v1alpha1
-              kind: ProjectDatabaseUser
-              spec:
-                forProvider:
-                  engine: postgresql
-                  name: admin
-                  serviceName: "4835abd389014831a84994db5635fc1a"
-                  clusterIdSelector:
-                    matchControllerRef: true
-                providerConfigRef:
-                  name: default
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.engine
-                toFieldPath: spec.forProvider.engine
