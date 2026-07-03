@@ -4,7 +4,7 @@ metadata:
   name: aidatabase-postgres-ovh
   labels:
     provider: ovh
-    engine: postgres
+    engine: postgresql
     ai: claude
 spec:
   compositeTypeRef:
@@ -12,77 +12,52 @@ spec:
     kind: AIDatabase
   mode: Pipeline
   pipeline:
-
-    # ── Step 1: Claude AI recommends infrastructure sizing ───────────────────
-    - step: ai-recommend-sizing
+    - step: ai-generate-resources
       functionRef:
         name: function-claude
-      input:
-        apiVersion: claude.fn.upbound.io/v1alpha1
-        kind: Prompt
-        metadata:
-          annotations:
-            upbound.io/name: ai-recommend-sizing
-        modelName: claude-sonnet-4-6
-        systemPrompt: |
-          You are a database infrastructure expert for OVHcloud.
-          Given a workload description, recommend optimal database sizing.
-          CRITICAL: output ONLY a raw JSON object. No markdown, no backticks, no code fences, no explanation. Start your response with { and end with }.
-          Required format: {"storageGB":<integer 10-500>,"plan":"<discovery|production>","flavorName":"<b3-8|b3-16>","reasoning":"<one sentence>"}
-          Rules: discovery=1 node dev/staging; production=2 nodes high availability.
-        userPrompt: |
-          Here is the composite resource as JSON: {{ .Composite }}
-          Extract the workloadDescription from spec.parameters and recommend optimal database sizing.
       credentials:
         - name: claude
           source: Secret
           secretRef:
             namespace: crossplane-system
             name: claude
-
-    # ── Step 2: Standard patch-and-transform to build the OVH resource ──────
-    - step: patch-and-transform
-      functionRef:
-        name: function-patch-and-transform
       input:
-        apiVersion: pt.fn.crossplane.io/v1beta1
-        kind: Resources
-        resources:
-          - name: databaseinstance
-            base:
-              apiVersion: databases.ovh.edixos.io/v1alpha1
-              kind: ProjectDatabase
-              spec:
-                forProvider:
-                  engine: postgresql
-                  version: "16"
-                  plan: discovery
-                  flavor: b3-8
-                  diskSize: 160
-                  serviceName: "4835abd389014831a84994db5635fc1a"
-                  nodes:
-                    - region: GRA
-                providerConfigRef:
-                  name: default
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.engine
-                toFieldPath: spec.forProvider.engine
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.version
-                toFieldPath: spec.forProvider.version
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.storageGB
-                toFieldPath: spec.forProvider.diskSize
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.plan
-                toFieldPath: spec.forProvider.plan
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.parameters.flavorName
-                toFieldPath: spec.forProvider.flavor
+        apiVersion: claude.fn.upbound.io/v1alpha1
+        kind: Prompt
+        modelName: claude-sonnet-4-6
+        systemPrompt: |
+          You are a Crossplane resource generator for OVHcloud databases.
+          Based on the workload description, generate ONE ProjectDatabase Kubernetes resource.
 
+          CRITICAL: Return ONLY valid YAML. No explanation, no markdown, no code fences, no backticks.
+          The resource MUST have metadata.annotations with upbound.io/name set to databaseinstance.
 
-    # ── Step 3: Auto-ready — composite becomes Ready when DB is Ready ────────
+          Size selection rules:
+          - production workloads (high traffic, HA, Ramadan/peak season): plan=production, flavor=b3-16, diskSize=200
+          - dev/staging (low traffic, non-critical): plan=discovery, flavor=b3-8, diskSize=160
+
+          Return exactly this structure with your chosen values for plan, flavor, diskSize:
+          apiVersion: databases.ovh.edixos.io/v1alpha1
+          kind: ProjectDatabase
+          metadata:
+            annotations:
+              upbound.io/name: databaseinstance
+          spec:
+            forProvider:
+              engine: postgresql
+              version: "16"
+              plan: CHOOSE_discovery_or_production
+              flavor: CHOOSE_b3-8_or_b3-16
+              diskSize: CHOOSE_160_or_200
+              serviceName: "4835abd389014831a84994db5635fc1a"
+              nodes:
+                - region: GRA
+            providerConfigRef:
+              name: default
+        userPrompt: |
+          Here is the composite resource as JSON: {{ .Composite }}
+          Extract workloadDescription from spec.parameters and generate the appropriate OVHcloud database resource.
+
     - step: auto-ready
       functionRef:
         name: function-auto-ready
