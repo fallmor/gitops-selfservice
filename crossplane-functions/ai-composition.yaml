@@ -33,10 +33,10 @@ spec:
           The resource MUST have metadata.annotations with upbound.io/name set to databaseinstance.
 
           Size selection rules:
-          - production workloads (high traffic, HA, Ramadan/peak season): plan=production, flavor=b3-16, diskSize=200
-          - dev/staging (low traffic, non-critical): plan=discovery, flavor=b3-8, diskSize=160
+          - production workloads (high traffic, HA, Ramadan/peak season): plan=production, flavor=b3-16, diskSize=200, nodes=2
+          - dev/staging (low traffic, non-critical): plan=discovery, flavor=b3-8, diskSize=160, nodes=1
 
-          Return exactly this structure with your chosen values for plan, flavor, diskSize:
+          For discovery (1 node):
           apiVersion: databases.ovh.edixos.io/v1alpha1
           kind: ProjectDatabase
           metadata:
@@ -46,11 +46,31 @@ spec:
             forProvider:
               engine: postgresql
               version: "16"
-              plan: CHOOSE_discovery_or_production
-              flavor: CHOOSE_b3-8_or_b3-16
-              diskSize: CHOOSE_160_or_200
+              plan: discovery
+              flavor: b3-8
+              diskSize: 160
               serviceName: "4835abd389014831a84994db5635fc1a"
               nodes:
+                - region: GRA
+            providerConfigRef:
+              name: default
+
+          For production (2 nodes):
+          apiVersion: databases.ovh.edixos.io/v1alpha1
+          kind: ProjectDatabase
+          metadata:
+            annotations:
+              upbound.io/name: databaseinstance
+          spec:
+            forProvider:
+              engine: postgresql
+              version: "16"
+              plan: production
+              flavor: b3-16
+              diskSize: 200
+              serviceName: "4835abd389014831a84994db5635fc1a"
+              nodes:
+                - region: GRA
                 - region: GRA
             providerConfigRef:
               name: default
