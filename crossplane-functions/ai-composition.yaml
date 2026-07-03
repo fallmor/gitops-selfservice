@@ -20,6 +20,9 @@ spec:
       input:
         apiVersion: claude.fn.upbound.io/v1alpha1
         kind: Prompt
+        metadata:
+          annotations:
+            upbound.io/name: ai-recommend-sizing
         modelName: claude-sonnet-4-6
         systemPrompt: |
           You are a database infrastructure expert for OVHcloud.
