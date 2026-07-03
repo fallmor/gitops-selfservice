@@ -35,7 +35,7 @@ spec:
           - discovery  → 1 node, low traffic, dev/staging, storageGB <= 50
           - production → 2 nodes, high availability, production workloads, storageGB > 50
         userPrompt: |
-          Workload description: {{ .Composite.spec.parameters.workloadDescription }}
+          Workload description: {{ .observed.composite.resource.spec.parameters.workloadDescription }}
       credentials:
         - name: claude
           source: Secret
