@@ -2,4 +2,9 @@
 .vscode
 .DS_Store
 presentation.html
-PRESENTATION.mdPITCH.md
+presentation-fr.html
+presentation-light.html
+slides.html
+PRESENTATION.md
+PITCH.md
+vendor/

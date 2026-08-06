@@ -78,7 +78,4 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: selfservice-gitops
-  dependsOn:
-    - name: external-secrets
-    - name: vault
+    name: gitops-selfservice
