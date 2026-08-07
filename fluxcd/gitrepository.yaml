@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  url: https://github.com/fallmor/gitops-selfservice
+  url: ssh://git@github.com/fallmor/gitops-selfservice.git
   ref:
     branch: main
   secretRef:
