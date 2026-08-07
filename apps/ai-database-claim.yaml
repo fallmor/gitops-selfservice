@@ -1,6 +1,3 @@
-# Developer claim — no cloud knowledge required.
-# The developer only describes the workload in plain English.
-# Claude AI will recommend storageGB, plan, and flavor automatically.
 apiVersion: selfservice.ovh/v1alpha1
 kind: AIDatabase
 metadata:

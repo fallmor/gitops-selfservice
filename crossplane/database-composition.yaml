@@ -8,6 +8,18 @@ spec:
     kind: Database
   mode: Pipeline
   pipeline:
+    - step: environment-configs
+      functionRef:
+        name: function-environment-configs
+      input:
+        apiVersion: environmentconfigs.fn.crossplane.io/v1beta1
+        kind: Input
+        spec:
+          environmentConfigs:
+            - type: Reference
+              ref:
+                name: ovh-project-config
+
     - step: patch-and-transform
       functionRef:
         name: function-patch-and-transform
@@ -26,12 +38,14 @@ spec:
                   plan: discovery
                   flavor: b3-8
                   diskSize: 160
-                  serviceName: "4835abd389014831a84994db5635fc1a"
                   nodes:
                     - region: GRA
                 providerConfigRef:
                   name: default
             patches:
+              - type: FromEnvironmentFieldPath
+                fromFieldPath: serviceName
+                toFieldPath: spec.forProvider.serviceName
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.engine
                 toFieldPath: spec.forProvider.engine
@@ -44,4 +58,60 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.parameters.flavor
                 toFieldPath: spec.forProvider.flavor
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.forProvider.description
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "Managed by Crossplane — claim %s"
+
+          - name: databaseuser
+            base:
+              apiVersion: databases.ovh.edixos.io/v1alpha1
+              kind: ProjectDatabasePostgresqlUser
+              spec:
+                forProvider:
+                  name: app
+                  clusterIdSelector:
+                    matchControllerRef: true
+                providerConfigRef:
+                  name: default
+                writeConnectionSecretToRef:
+                  namespace: crossplane-system
+            patches:
+              - type: FromEnvironmentFieldPath
+                fromFieldPath: serviceName
+                toFieldPath: spec.forProvider.serviceName
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.writeConnectionSecretToRef.name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "%s-user-conn"
+
+          - name: bucket
+            base:
+              apiVersion: cloud.ovh.edixos.io/v1alpha1
+              kind: ProjectStorage
+              spec:
+                forProvider:
+                  regionName: GRA
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromEnvironmentFieldPath
+                fromFieldPath: serviceName
+                toFieldPath: spec.forProvider.serviceName
+              - type: FromCompositeFieldPath
+                fromFieldPath: metadata.name
+                toFieldPath: spec.forProvider.name
+                transforms:
+                  - type: string
+                    string:
+                      type: Format
+                      fmt: "%s-backups"
 

@@ -4,5 +4,6 @@ resources:
   - function-patch-and-transform.yaml
   - function-auto-ready.yaml
   - function-claude-recommender.yaml
+  - function-environment-configs.yaml
   - ai-database-xrd.yaml
   - ai-composition.yaml
