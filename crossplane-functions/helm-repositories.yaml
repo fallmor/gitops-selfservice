@@ -1,0 +1,35 @@
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  name: helmrepo-prometheus-community
+spec:
+  forProvider:
+    manifest:
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: HelmRepository
+      metadata:
+        name: prometheus-community
+        namespace: crossplane-system
+      spec:
+        interval: 1h
+        url: https://prometheus-community.github.io/helm-charts
+  providerConfigRef:
+    name: kubernetes-incluster
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  name: helmrepo-grafana
+spec:
+  forProvider:
+    manifest:
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: HelmRepository
+      metadata:
+        name: grafana
+        namespace: crossplane-system
+      spec:
+        interval: 1h
+        url: https://grafana.github.io/helm-charts
+  providerConfigRef:
+    name: kubernetes-incluster

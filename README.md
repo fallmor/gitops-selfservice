@@ -45,12 +45,12 @@ kubectl create namespace crossplane-system
 # OVHcloud credentials
 kubectl create secret generic ovh-secret \
   --namespace crossplane-system \
-  --from-literal=credentials='{"endpoint":"ovh-eu","appKey":"<APP_KEY>","appSecret":"<APP_SECRET>","consumerKey":"<CONSUMER_KEY>"}'
+  --from-literal=credentials='{"endpoint":"ovh-eu","application_key":"<APP_KEY>","application_secret":"<APP_SECRET>","consumer_key":"<CONSUMER_KEY>"}'
 
 # Claude API key
 kubectl create secret generic claude \
   --namespace crossplane-system \
-  --from-literal=credentials=<YOUR_ANTHROPIC_API_KEY>
+  --from-literal=ANTHROPIC_API_KEY=<YOUR_ANTHROPIC_API_KEY>
 ```
 
 ### 2. Bootstrap Flux

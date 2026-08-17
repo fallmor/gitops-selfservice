@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - function-patch-and-transform.yaml
   - function-auto-ready.yaml
-  - function-claude-recommender.yaml
   - function-environment-configs.yaml
-  - ai-database-xrd.yaml
-  - ai-composition.yaml
+  - function-claude.yaml
+  - helm-repositories.yaml
+  - ai-observability-xrd.yaml
+  - ai-observability-composition.yaml

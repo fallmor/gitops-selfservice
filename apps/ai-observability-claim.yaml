@@ -1,0 +1,14 @@
+apiVersion: selfservice.ovh/v1alpha1
+kind: AIObservability
+metadata:
+  name: shop-observability
+  namespace: default
+spec:
+  parameters:
+    workloadDescription: >
+      Customer-facing checkout API. Intermittent slow requests reported by
+      support, hard to reproduce. On-call needs to correlate request traces
+      with logs across the checkout, payment, and inventory services during
+      incident investigation.
+  compositionRef:
+    name: aiobservability-helm

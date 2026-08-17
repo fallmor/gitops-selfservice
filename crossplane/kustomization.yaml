@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - providerconfig.yaml
+  - providerconfig-kubernetes.yaml
   - database-xrd.yaml
   - database-composition.yaml

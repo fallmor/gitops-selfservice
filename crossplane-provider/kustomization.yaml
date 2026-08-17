@@ -5,3 +5,5 @@ resources:
   - namespace.yaml
   - runtimeconfig.yaml
   - provider.yaml
+  - provider-kubernetes.yaml
+  - rbac-kubernetes.yaml

@@ -1,0 +1,31 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: provider-kubernetes-helm-manager
+rules:
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["source.toolkit.fluxcd.io"]
+    resources: ["helmrepositories"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["prometheusrules"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: provider-kubernetes-helm-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: provider-kubernetes-helm-manager
+subjects:
+  # crossplane-rbac-manager only grants provider-kubernetes access to the CRDs
+  # it ships itself, never to third-party types like HelmRelease. This SA name
+  # is tied to the current ProviderRevision hash and must be updated if the
+  # provider package is upgraded and the revision changes.
+  - kind: ServiceAccount
+    name: provider-kubernetes-b32140022ee8
+    namespace: crossplane-system
