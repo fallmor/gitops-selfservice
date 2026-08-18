@@ -1,12 +1,12 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: CompositeResourceDefinition
 metadata:
-  name: databases.selfservice.ovh
+  name: databasestacks.selfservice.ovh
 spec:
   group: selfservice.ovh
   names:
-    kind: Database
-    plural: databases
+    kind: DatabaseStack
+    plural: databasestacks
   versions:
   - name: v1alpha1
     served: true
@@ -48,5 +48,5 @@ spec:
             required:
               - parameters
   claimNames:
-    kind: Database
-    plural: databases
+    kind: DatabaseStack
+    plural: databasestacks

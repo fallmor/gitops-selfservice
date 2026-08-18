@@ -1,5 +1,5 @@
 apiVersion: selfservice.ovh/v1alpha1
-kind: Database
+kind: DatabaseStack
 metadata:
   name: demo-postgres-db
   namespace: default

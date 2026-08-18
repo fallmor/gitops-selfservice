@@ -5,6 +5,5 @@ resources:
   - function-auto-ready.yaml
   - function-environment-configs.yaml
   - function-claude.yaml
-  - helm-repositories.yaml
-  - ai-observability-xrd.yaml
-  - ai-observability-composition.yaml
+  - ai-database-xrd.yaml
+  - ai-composition.yaml
