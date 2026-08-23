@@ -62,7 +62,10 @@ spec:
           low end unless justified: discovery 160-240, production 320-640, advanced 640-1280.
 
           Fixed structure — fill CHOSEN_PLAN/CHOSEN_FLAVOR/CHOSEN_DISKSIZE per the rules above,
-          and repeat the `nodes` entry (always `region: GRA`) once per node in the chosen plan:
+          repeat the `nodes` entry (always `region: GRA`) once per node in the chosen plan, and
+          set `description` to "AI-sized (<plan>) for claim <name>" using `.metadata.name` from
+          the composite JSON — this is the only way to identify this database in the OVH
+          console, without it every instance looks identical:
           apiVersion: databases.ovh.edixos.io/v1alpha1
           kind: ProjectDatabase
           metadata:
@@ -75,6 +78,7 @@ spec:
               plan: CHOSEN_PLAN
               flavor: CHOSEN_FLAVOR
               diskSize: CHOSEN_DISKSIZE
+              description: "AI-sized (CHOSEN_PLAN) for claim CLAIM_NAME"
               serviceName: "4835abd389014831a84994db5635fc1a"
               nodes:
                 - region: GRA
@@ -82,7 +86,8 @@ spec:
               name: default
         userPrompt: |
           Here is the composite resource as JSON: {{ .Composite }}
-          Extract workloadDescription from spec.parameters and generate the appropriate OVHcloud database resource.
+          Extract workloadDescription and metadata.name from spec.parameters, then generate the
+          appropriate OVHcloud database resource.
 
     - step: auto-ready
       functionRef:
