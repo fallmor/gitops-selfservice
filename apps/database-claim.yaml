@@ -8,6 +8,5 @@ spec:
     engine: postgresql
     version: "16"
     plan: discovery
-    flavor: b3-8
   compositionRef:
     name: database-postgres-ovh
