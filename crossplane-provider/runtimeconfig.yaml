@@ -16,3 +16,5 @@ spec:
                     secretKeyRef:
                       name: ovh-project
                       key: projectId
+                - name: PROVIDER_POLL
+                  value: "2m"
