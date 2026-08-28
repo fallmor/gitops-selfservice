@@ -6,7 +6,6 @@ metadata:
 spec:
   parameters:
     engine: postgresql
-    version: "16"
     plan: discovery
   compositionRef:
     name: database-postgres-ovh

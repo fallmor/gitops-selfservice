@@ -5,8 +5,6 @@ metadata:
   namespace: default
 spec:
   parameters:
-    engine: postgresql
-    version: "16"
     workloadDescription: >
       Plateforme e-commerce pour une marque de retail ouest-africaine.
       Environ 800 utilisateurs concurrents attendus aux heures de pointe
