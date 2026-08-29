@@ -81,9 +81,13 @@ git push
 Crossplane provisions the OVHcloud resources automatically.
 
 ```bash
-kubectl get databases -n default
+kubectl get databasestacks -n default
 kubectl get managed
 ```
+
+### 4. Try the AI-assisted claim
+
+`crossplane-functions/ai-composition.yaml` has a placeholder `serviceName: "YOUR_OVH_SERVICE_ID"` — replace it with your own OVHcloud public cloud project/service ID before applying `apps/ai-database-claim.yaml`, otherwise the generated `ProjectDatabase` will point at a project that doesn't exist.
 
 ---
 
