@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arrêtez d'écrire des tickets – Écrivez du YAML | OVHcloud</title>
+  <link rel="stylesheet" href="vendor/reveal/reveal.css" />
+  <link rel="stylesheet" href="vendor/reveal/theme/white.css" />
+  <link rel="stylesheet" href="vendor/reveal/plugin/highlight/monokai.css" />
+  <style>
+    :root {
+      --ink: #16213e;
+      --body: #3d4552;
+      --muted: #6b7280;
+      --accent: #1f7a5c;
+      --danger: #b5432c;
+      --bg: #ffffff;
+      --shadow: 0 2px 10px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.05);
+      --code-bg: #16302c;
+      --code-border: rgba(255,255,255,0.08);
+      --callout-bg: #14202b;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+
+    .reveal { font-family: var(--sans); color: var(--body); }
+    .reveal .slides section { text-align: left; }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: var(--sans); text-transform: none; }
+
+    /* ── Eyebrow / labels ── */
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      font-size: 0.5em;
+      margin-bottom: 0.6em;
+    }
+
+    /* ── Headings ── */
+    .reveal h2 {
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 1.3em;
+      margin: 0 0 0.5em 0;
+    }
+
+    /* ── Title slide ── */
+    .title-slide { text-align: center !important; }
+    .title-slide h1 {
+      font-size: 1.9em;
+      font-weight: 800;
+      color: var(--ink);
+      margin: 0 0 0.35em 0;
+      line-height: 1.2;
+    }
+    .title-slide .subtitle { font-size: 0.85em; color: var(--accent); font-weight: 600; margin-bottom: 0.5em; }
+    .title-slide .tagline { font-size: 0.6em; color: var(--muted); max-width: 620px; margin: 0 auto 0.9em; line-height: 1.6; }
+    .stackline { font-size: 0.5em; color: var(--muted); letter-spacing: 0.03em; }
+    .stackline b { color: var(--ink); }
+
+    /* ── Soft cards (no border, shadow only) ── */
+    .cards { display: grid; gap: 0.7em; }
+    .cards-2 { grid-template-columns: 1fr 1fr; }
+    .cards-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 0.7em 0.95em;
+    }
+    .card .card-title { font-size: 0.66em; font-weight: 700; color: var(--ink); margin-bottom: 0.25em; }
+    .card .card-tag { float: right; font-family: var(--mono); font-size: 0.85em; color: var(--muted); font-weight: 400; }
+    .card p { font-size: 0.56em; color: var(--muted); margin: 0; line-height: 1.5; }
+
+    /* ── Numbered / dotted badge lists (sequential steps) ── */
+    .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55em; }
+    .steps li { display: flex; align-items: flex-start; gap: 0.7em; font-size: 0.62em; }
+    .num-badge {
+      width: 1.6em; height: 1.6em; min-width: 1.6em;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85em;
+    }
+    .num-badge.dark { background: var(--ink); }
+    .step-body strong { color: var(--ink); font-size: 1.02em; display: block; }
+    .step-body span { color: var(--muted); font-size: 0.92em; }
+
+    /* ── Dot bullet list (qualitative / parallel points, no boxes) ── */
+    ul.dotlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.65em; }
+    ul.dotlist li { display: flex; gap: 0.65em; align-items: flex-start; }
+    ul.dotlist .dot {
+      width: 0.5em; height: 0.5em; min-width: 0.5em;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 0.5em;
+    }
+    ul.dotlist .dot.dark { background: var(--ink); }
+    ul.dotlist .txt { font-size: 0.62em; line-height: 1.5; color: var(--muted); }
+    ul.dotlist .txt b { color: var(--ink); }
+
+    /* ── Callout: solid dark box for the one thing to remember ── */
+    .callout {
+      background: var(--callout-bg);
+      color: #f2f5f4;
+      border-radius: 12px;
+      padding: 0.9em 1.1em;
+      font-size: 0.6em;
+      line-height: 1.55;
+    }
+    .callout b { color: #fff; }
+    .callout .arrow { color: var(--accent); font-weight: 800; margin-right: 0.35em; }
+
+    /* ── Full-width note bar (definitions / clarifications) ── */
+    .notebar {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 8px;
+      padding: 0.6em 0.9em;
+      font-size: 0.48em;
+      line-height: 1.5;
+    }
+    .notebar b { color: #fff; }
+
+    /* ── Code panels ── */
+    .code-label { display: flex; align-items: center; gap: 0.5em; font-weight: 700; color: var(--ink); font-size: 0.56em; margin-bottom: 0.4em; }
+    .code-label .dot { width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--accent); }
+    .code-label .dot.dark { background: var(--ink); }
+    .filepath { font-family: var(--mono); font-size: 0.48em; color: var(--muted); margin-bottom: 0.35em; }
+
+    .reveal pre {
+      box-shadow: none;
+      border: 1px solid var(--code-border);
+      border-radius: 10px;
+      background: var(--code-bg);
+      font-size: 0.42em;
+      margin: 0.3em 0;
+      width: 100%;
+    }
+    .reveal pre code {
+      background: transparent !important;
+      overflow: visible !important;
+      white-space: pre-wrap !important;
+      word-break: break-word;
+      padding: 0.7em 0.9em !important;
+      max-height: none !important;
+      line-height: 1.4;
+    }
+    .reveal code { font-family: var(--mono); }
+
+    /* ── Flow diagram (soft cards + accent arrows) ── */
+    .flow { display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap; margin: 0.6em 0; }
+    .flow-box {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 0.45em 0.85em;
+      font-size: 0.55em;
+      text-align: center;
+    }
+    .flow-box strong { display: block; color: var(--ink); font-size: 1em; }
+    .flow-box span { color: var(--muted); font-size: 0.85em; }
+    .flow-arrow { color: var(--accent); font-size: 0.95em; font-weight: 700; }
+
+    /* ── Two column ── */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4em; align-items: start; }
+
+    /* ── Section divider ── */
+    .section-divider { text-align: center !important; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .section-divider .section-num { font-size: 5em; font-weight: 900; color: #eef2f0; line-height: 1; }
+    .section-divider h2 { font-size: 1.8em; margin-top: 0.1em; }
+    .section-divider p { font-size: 0.65em; color: var(--muted); }
+    .section-divider .section-preview { font-family: var(--mono); font-size: 0.42em; color: var(--accent); letter-spacing: 0.05em; margin-top: 1.4em; }
+
+    /* ── Demo marker ── */
+    .demo-badge {
+      display: inline-block;
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 0.5em;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.5em;
+    }
+
+    /* ── Timeline (bio) ── */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: flex; gap: 0.9em; }
+    .timeline-item .tl-rail { display: flex; flex-direction: column; align-items: center; flex: none; }
+    .timeline-item .tl-dot { width: 0.6em; height: 0.6em; margin-top: 0.3em; border-radius: 50%; background: var(--ink); }
+    .timeline-item .tl-dot.now { background: var(--accent); }
+    .timeline-item .tl-line { flex: 1; width: 2px; background: #e7e9ee; margin-top: 0.25em; min-height: 1.4em; }
+    .timeline-item:last-child .tl-line { display: none; }
+    .timeline-item .tl-content { flex: 1; padding-bottom: 0.8em; }
+    .timeline-item .tl-meta { font-family: var(--mono); font-size: 0.48em; color: var(--accent); letter-spacing: 0.05em; font-weight: 700; }
+    .timeline-item .tl-title { font-size: 0.68em; font-weight: 700; color: var(--ink); margin: 0.1em 0 0.15em; }
+    .timeline-item .tl-content p { font-size: 0.54em; color: var(--muted); margin: 0; line-height: 1.5; }
+    .taglist { display: flex; gap: 0.4em; flex-wrap: wrap; margin-top: 0.5em; }
+    .taglist span { font-size: 0.42em; color: var(--muted); border: 1px solid #e7e9ee; border-radius: 100px; padding: 0.25em 0.7em; }
+
+    /* ── Fixed brand footer + page number ── */
+    .brand-footer {
+      position: fixed; left: 24px; bottom: 14px;
+      font-size: 11px; color: var(--muted); z-index: 20;
+    }
+    .reveal .slide-number {
+      color: var(--muted) !important;
+      background: transparent !important;
+      font-family: var(--sans) !important;
+      font-size: 11px !important;
+      right: 24px !important; bottom: 14px !important;
+    }
+    .reveal .controls { color: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="brand-footer">Mor Fall · OVHcloud</div>
+<div class="reveal">
+<div class="slides">
+
+<!-- ═══════════════════════ SLIDE 1 – TITRE ═══════════════════════ -->
+<section class="title-slide">
+  <div class="eyebrow" style="text-align:center;">Cloud Native Dakar</div>
+  <h1>Arrêtez d'écrire des tickets<br/>– Écrivez du YAML</h1>
+  <div class="subtitle">Platform Engineering avec Flux · Crossplane</div>
+  <div class="tagline">
+    Construire une plateforme self-service avec GitOps, et un control plane universel
+    pour l'infrastructure.
+  </div>
+  <div class="stackline">Stack : <b>Flux CD</b> · <b>Crossplane</b> · <b>OVHcloud Provider</b></div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 2 – QUI VOUS PARLE ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Avant de commencer</div>
+  <h2>Qui vous parle</h2>
+  <div class="timeline" style="margin-top:0.6em;">
+    <div class="timeline-item">
+      <div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-meta">4 ANS ET DEMI</div>
+        <div class="tl-title">Intégrateur DevOps @ Orange Business</div>
+        <p>Conception d'offres de plateforme managée – Kubernetes-as-a-Service et les briques que les clients consomment par-dessus.</p>
+        <div class="taglist"><span>Keycloak</span><span>Vault</span><span>Mimir</span><span>Nix</span><span>CUE</span><span>Observability</span><span>Cloud</span><span>Terraform</span><span>Helm</span></div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-rail"><div class="tl-dot now"></div></div>
+      <div class="tl-content">
+        <div class="tl-meta" style="color:var(--accent);">AUJOURD'HUI</div>
+        <div class="tl-title">SRE, Bases de Données Managées @ OVHcloud</div>
+        <p>Exploitation de l'univers des bases de données managées : OpenStack en dessous, Kubernetes pour le control plane, Go et Ansible pour l'automatisation.</p>
+        <div class="taglist"><span>OpenStack</span><span>Kubernetes</span><span>Go</span><span>Ansible</span><span>Terraform</span><span>PostgreSQL</span><span>MySQL</span><span>ClickHouse</span><span>Observability</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 3 – AGENDA ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Agenda</div>
+  <h2>Au programme</h2>
+  <div class="cards cards-2" style="margin-top:0.4em;">
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge">1</div>
+        <div>
+          <div class="card-title">Le problème</div>
+          <p>Pourquoi les équipes ops sont un goulot d'étranglement</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge">2</div>
+        <div>
+          <div class="card-title">GitOps avec Flux</div>
+          <p>Git comme source de vérité unique – réconciliation continue</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge">3</div>
+        <div>
+          <div class="card-title">Crossplane</div>
+          <p>Le control plane universel pour l'infra – XRD, Compositions, Claims</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge dark">4</div>
+        <div>
+          <div class="card-title">Crossplane Functions + Claude AI</div>
+          <p>Des compositions programmables – une infra qui comprend l'intention</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 4 – LE PROBLÈME ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Le constat</div>
+  <h2>Pourquoi les équipes plateforme existent</h2>
+  <ul class="dotlist" style="margin-top:0.5em; margin-bottom:0.6em; gap:0.45em;">
+    <li><span class="dot"></span><span class="txt"><b>Infrastructure à la carte de tickets</b> – des jours d'attente pour une simple base de données.</span></li>
+    <li><span class="dot"></span><span class="txt"><b>Drift de configuration</b> – la prod change, en silence.</span></li>
+    <li><span class="dot dark"></span><span class="txt"><b>Pas d'audit trail</b> – aucun historique, aucune revue de code.</span></li>
+    <li><span class="dot dark"></span><span class="txt"><b>Silos de compétences</b> – le savoir verrouillé chez quelques personnes.</span></li>
+  </ul>
+  <div class="callout"><span class="arrow">→</span><b>Objectif :</b> l'infra doit être un produit que les équipes consomment – pas une file d'attente.</div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 4bis – PLATFORM ENGINEERING ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Le contexte</div>
+  <h2>Platform Engineering</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin: 0.5em 0 0.7em;">
+    Construire une plateforme interne que les équipes produit consomment en self-service – un "golden path" avec des garde-fous, sans exiger l'expertise cloud du développeur.
+  </div>
+  <div class="code-label"><span class="dot dark"></span>Avant</div>
+  <div class="flow" style="margin: 0.2em 0 0.6em;">
+    <div class="flow-box"><strong>Développeur</strong><span>a besoin d'infra</span></div>
+    <span class="flow-arrow" style="color:var(--danger);">→</span>
+    <div class="flow-box"><strong>Ticket Jira</strong><span>attente</span></div>
+    <span class="flow-arrow" style="color:var(--danger);">→</span>
+    <div class="flow-box"><strong>Équipe Ops</strong><span>config manuelle</span></div>
+    <span class="flow-arrow" style="color:var(--danger);">→</span>
+    <div class="flow-box"><strong>Cloud</strong><span>credentials par Slack</span></div>
+  </div>
+  <div class="code-label"><span class="dot"></span>Avec Platform Engineering</div>
+  <div class="flow" style="margin: 0.2em 0 0.6em;">
+    <div class="flow-box"><strong>Développeur</strong><span>écrit un Claim</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Plateforme</strong><span>garde-fous, self-service</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Cloud</strong><span>prêt immédiatement</span></div>
+  </div>
+  <div class="callout">
+    <b>GitOps (Flux) + un control plane universel (Crossplane)</b> – c'est l'implémentation technique concrète de ce principe.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 5 – SECTION GITOPS ═══════════════════════ -->
+<section class="section-divider">
+  <div class="section-num">01</div>
+  <h2>GitOps avec Flux</h2>
+  <p>Git comme source de vérité unique pour tout</p>
+  <div class="section-preview">GitRepository · HelmRepository · Kustomization</div>
+  <div style="font-size:0.42em; color:var(--muted); margin-top:1em; letter-spacing:0.02em;">En production chez Cisco · SAP · Maersk · Volvo Cars · Grafana Labs</div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 6 – FLUX CD ═══════════════════════ -->
+<section>
+  <div class="eyebrow">GitOps</div>
+  <h2>Flux CD – Le moteur GitOps</h2>
+  <div class="flow" style="justify-content:center; margin: 0.5em 0 0.9em;">
+    <div class="flow-box"><strong>Développeur</strong><span>ouvre une PR</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>GitRepository</strong><span>+ HelmRepository</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Flux</strong><span>détecte le changement</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Cluster</strong><span>état désiré</span></div>
+  </div>
+  <div class="cols">
+    <div>
+      <ul class="steps">
+        <li><div class="num-badge">1</div><div class="step-body"><strong>Surveille ses sources en continu</strong><span>GitRepository, HelmRepository, ou OCIRepository – Git n'est qu'une des trois</span></div></li>
+        <li><div class="num-badge">2</div><div class="step-body"><strong>Applique les manifestes automatiquement</strong><span>plus de kubectl apply en prod, jamais</span></div></li>
+        <li><div class="num-badge">3</div><div class="step-body"><strong>Détecte et corrige le drift</strong><span>si quelqu'un modifie le cluster, Flux l'annule</span></div></li>
+        <li><div class="num-badge">4</div><div class="step-body"><strong>Audit trail complet</strong><span>chaque changement tracé à un commit, un auteur, un horodatage</span></div></li>
+      </ul>
+    </div>
+    <div>
+      <div class="filepath">fluxcd/gitrepository.yaml</div>
+      <pre><code class="language-yaml">apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: gitops-selfservice
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/fallmor/gitops-selfservice
+  ref:
+    branch: main</code></pre>
+      <div style="font-size:0.48em; color:var(--muted); margin-top:0.3em;">
+        ↑ Un des trois. Ce dépôt Git est notre source ; on verra une HelmRepository juste après.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 6ter – ARCHITECTURE CONTROLLERS ═══════════════════════ -->
+<section>
+  <div class="eyebrow">GitOps</div>
+  <h2>Flux n'est pas un seul binaire</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.7em;">
+    Adapté du schéma officiel du projet – 4 controllers indépendants, chacun un rôle précis.
+  </div>
+  <div style="text-align:center;">
+    <img src="assets/diagrams/flux-controllers.svg" style="max-width:100%; height:auto;" alt="Architecture Flux : Kubernetes API, Source Controller, Kustomize Controller, Helm Controller, Notification Controller">
+  </div>
+  <div class="callout" style="margin-top:0.7em;">
+    <b>Pas d'UI, pas de serveur API custom</b> – juste des CRD Kubernetes et des boucles de contrôle qui réconcilient.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 6bis – KUSTOMIZATION & HELMRELEASE ═══════════════════════ -->
+<section>
+  <div class="eyebrow">GitOps</div>
+  <h2>Flux va plus loin qu'un GitRepository</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.5em;">
+    Le GitRepository dit où regarder. Kustomization et HelmRelease décident quoi appliquer.
+  </div>
+  <div class="cols">
+    <div>
+      <div class="code-label"><span class="dot"></span>HelmRelease – installer un chart</div>
+      <div class="filepath">fluxcd/helmrelease.yaml</div>
+      <pre><code class="language-yaml">apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crossplane
+spec:
+  chart:
+    spec:
+      chart: crossplane
+      sourceRef:
+        kind: HelmRepository
+        name: crossplane-stable</code></pre>
+      <div style="font-size:0.46em; color:var(--muted); margin-top:0.25em;">↑ Crossplane lui-même est installé via un chart Helm, piloté par Flux.</div>
+    </div>
+    <div>
+      <div class="code-label"><span class="dot dark"></span>Kustomization – appliquer un dossier</div>
+      <div class="filepath">fluxcd/helmrelease.yaml</div>
+      <pre><code class="language-yaml">apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: crossplane-resources
+spec:
+  path: ./crossplane
+  dependsOn:
+    - name: crossplane-provider
+  sourceRef:
+    kind: GitRepository
+    name: gitops-selfservice</code></pre>
+      <div style="font-size:0.46em; color:var(--muted); margin-top:0.25em;">↑ Chaque dossier a sa propre Kustomization, ordonnée via <code>dependsOn</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 7 – SECTION CROSSPLANE ═══════════════════════ -->
+<section class="section-divider">
+  <div class="section-num">02</div>
+  <h2>Crossplane</h2>
+  <p>Le control plane universel pour l'infrastructure</p>
+  <div class="section-preview">XRD · Composition · Claim</div>
+  <div style="font-size:0.42em; color:var(--muted); margin-top:1em; letter-spacing:0.02em;">En production chez IBM · Nike · SAP · Autodesk · Nokia</div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 8 – CROSSPLANE CONCEPTS ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Crossplane</div>
+  <h2>3 concepts à connaître</h2>
+  <div class="cards" style="grid-template-columns: 1fr; gap:0.3em; margin-top:0.3em; margin-bottom:0.3em;">
+    <div class="card" style="padding:0.4em 0.9em;">
+      <div class="card-title">XRD – Le contrat d'API <span class="card-tag">database-xrd.yaml</span></div>
+      <p>Ce que les développeurs peuvent demander – comme un CRD Kubernetes.</p>
+    </div>
+    <div class="card" style="padding:0.4em 0.9em;">
+      <div class="card-title">Composition – Le template <span class="card-tag">composition.yaml</span></div>
+      <p>Fait correspondre le Claim à de vraies ressources cloud. Les devs ne voient jamais cette couche.</p>
+    </div>
+    <div class="card" style="padding:0.4em 0.9em;">
+      <div class="card-title">Claim – Le bon de commande <span class="card-tag">claim.yaml</span></div>
+      <p>10 lignes de YAML. Crossplane provisionne l'infra cloud réelle.</p>
+    </div>
+  </div>
+  <div class="flow" style="justify-content:center;">
+    <div class="flow-box"><strong>Développeur</strong><span>écrit un Claim</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>XRD</strong><span>valide</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Composition</strong><span>templating</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>Provider-OVH</strong><span>appel API</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>OVHcloud</strong><span>ressource créée</span></div>
+  </div>
+  <div class="notebar" style="margin-top:0.5em;">
+    Un provider peut exposer 50+ types de resources (CRDs). <b>ManagedResourceActivationPolicy</b> (Crossplane v2, alpha) permet de n'en activer que certains.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 9 – XRD → COMPOSITION ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Crossplane</div>
+  <h2>XRD → Composition – Suivre un champ</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.3em;">
+    Deux vrais fichiers de ce repo. Même champ, deux noms.
+  </div>
+  <div class="cols">
+    <div>
+      <div class="filepath">crossplane/database-xrd.yaml</div>
+      <pre><code class="language-yaml">properties:
+  plan:
+    type: string
+    default: discovery
+    enum:
+      - discovery
+      - production
+  flavor:
+    type: string
+    default: b3-8
+    enum:
+      - b3-8
+      - b3-16</code></pre>
+      <div style="font-size:0.46em; color:var(--muted); margin-top:0.25em;">↑ Ce qu'un développeur a le droit d'écrire dans un Claim.</div>
+    </div>
+    <div>
+      <div class="filepath">crossplane/database-composition.yaml</div>
+      <pre><code class="language-yaml">patches:
+  - type: FromCompositeFieldPath
+    fromFieldPath: spec.parameters.plan
+    toFieldPath: spec.forProvider.plan
+  - type: FromCompositeFieldPath
+    fromFieldPath: spec.parameters.flavor
+    toFieldPath: spec.forProvider.flavor</code></pre>
+      <div style="font-size:0.46em; color:var(--muted); margin-top:0.25em;">↑ Ce qui transforme ce champ en un vrai paramètre OVHcloud.</div>
+    </div>
+  </div>
+  <div class="flow" style="justify-content:center; margin: 0.25em 0;">
+    <div class="flow-box"><strong style="color:var(--accent);">spec.parameters.plan</strong><span>le Claim</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong style="color:var(--ink);">spec.forProvider.plan</strong><span>la ressource OVHcloud</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>provider-ovh</strong><span>lit ce champ, appelle l'API OVH</span></div>
+  </div>
+  <div class="callout">
+    <b>Pas de magie</b> – le XRD décide ce qu'on peut écrire, les patches décident où ça atterrit, le provider fait l'appel réel.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 9bis – ARCHITECTURE CROSSPLANE ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Crossplane</div>
+  <h2>Crossplane non plus n'est pas un seul binaire</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.7em;">
+    Ce qui tourne réellement dans <code>crossplane-system</code> sur ce cluster.
+  </div>
+  <div style="text-align:center;">
+    <img src="assets/diagrams/crossplane-architecture.svg" style="max-width:100%; height:auto;" alt="Architecture Crossplane : Kubernetes API, cœur Crossplane, Functions, Provider, RBAC Manager">
+  </div>
+  <div class="callout" style="margin-top:0.6em;">
+    <b>Différence clé</b> – les Functions répondent dans le pipeline, en synchrone. Le Provider, lui, tourne sa propre boucle de contrôle, indépendamment, vers l'API cloud réelle.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 10 – FLUX + CROSSPLANE ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Le duo</div>
+  <h2>Flux + Crossplane – Un vrai partenariat</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.7em;">Aucun recouvrement. Complémentarité pure.</div>
+  <div class="cols">
+    <div>
+      <div class="code-label"><span class="dot"></span>FLUX – Livraison d'apps &amp; de config</div>
+      <ul class="dotlist">
+        <li><span class="dot"></span><span class="txt">Surveille les dépôts Git</span></li>
+        <li><span class="dot"></span><span class="txt">Synchronise les manifestes vers le cluster</span></li>
+        <li><span class="dot"></span><span class="txt">Gère les releases Helm</span></li>
+        <li><span class="dot"></span><span class="txt">Déclenche les claims Crossplane via Git</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="code-label"><span class="dot dark"></span>CROSSPLANE – Provisioning d'infrastructure</div>
+      <ul class="dotlist">
+        <li><span class="dot dark"></span><span class="txt">Reçoit les claims d'infra depuis Git</span></li>
+        <li><span class="dot dark"></span><span class="txt">Provisionne de vraies ressources cloud</span></li>
+        <li><span class="dot dark"></span><span class="txt">Réconcilie le drift <em>en continu</em></span></li>
+        <li><span class="dot dark"></span><span class="txt">Expose le cloud comme une API Kubernetes</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:0.8em;">
+    Git est le control plane. Flux le livre. Crossplane l'impose. Vous ne touchez jamais une console cloud.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 11 – DEMO 1 & 2 ═══════════════════════ -->
+<section>
+  <div class="demo-badge">Demo</div>
+  <h2>Un Claim, puis un drift – en direct</h2>
+  <div class="cols">
+    <div>
+      <div class="filepath">apps/database-claim.yaml</div>
+      <pre><code class="language-yaml">apiVersion: selfservice.ovh/v1alpha1
+kind: DatabaseStack
+metadata:
+  name: demo-postgres-db
+  namespace: default
+spec:
+  parameters:
+    engine: postgresql
+    plan: discovery
+  compositionRef:
+    name: database-postgres-ovh</code></pre>
+      <div style="font-size:0.46em; color:var(--muted); margin-top:0.25em;">↑ 10 lignes. <code>flavor</code> et <code>version</code> ont des défauts sensés dans le XRD – pas besoin de les préciser. Aucune connaissance cloud requise. Aucun ticket.</div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:0.5em;">
+        <div class="card-title" style="color:var(--accent);">1 – Provisioning</div>
+        <p><code>git push</code> → Flux applique → Crossplane crée la base, l'utilisateur et un bucket sur OVHcloud.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--danger);">2 – Réconciliation</div>
+        <p>Je modifie et je supprime des ressources depuis la console OVH. Crossplane corrige et recrée – automatiquement.</p>
+      </div>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:0.6em;">
+    <b>C'est ça, la réconciliation.</b> Pas seulement du provisioning – de l'enforcement continu de l'état désiré.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 13 – SECTION FUNCTIONS + AI ═══════════════════════ -->
+<section class="section-divider">
+  <div class="section-num">03</div>
+  <h2>Crossplane Functions</h2>
+  <p>Rendre les compositions programmables – et intelligentes</p>
+  <div class="section-preview">function-claude · function-auto-ready</div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 14 – FUNCTIONS ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Functions</div>
+  <h2>Crossplane Functions – La couche extensible</h2>
+  <div style="font-size:0.6em; color:var(--muted); margin-bottom:0.4em;">
+    Les compositions classiques sont des patches YAML statiques. Les Functions ajoutent <b style="color:var(--ink);">de la vraie logique</b>.
+  </div>
+  <div class="flow" style="justify-content:center; margin-bottom:0.4em;">
+    <div class="flow-box"><strong style="color:var(--accent);">Claim</strong></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>function-claude</strong><span>génère la ressource</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong>function-auto-ready</strong><span>la marque Ready</span></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-box"><strong style="color:var(--ink);">Ressources Cloud</strong></div>
+  </div>
+  <div class="cards cards-2" style="margin-top:0.3em; gap:0.4em;">
+    <div class="card" style="padding:0.45em 0.8em;">
+      <div class="card-title">function-patch-and-transform</div>
+      <p>Patches classiques de champs. Utilisé dans <code>database-composition.yaml</code>.</p>
+    </div>
+    <div class="card" style="padding:0.45em 0.8em;">
+      <div class="card-title">function-auto-ready</div>
+      <p>Positionne la condition Ready une fois la ressource générée valide. Utilisé dans le pipeline IA.</p>
+    </div>
+    <div class="card" style="padding:0.45em 0.8em;">
+      <div class="card-title">function-kcl</div>
+      <p>Scripting KCL – fait partie de l'écosystème, pas utilisé dans ce repo.</p>
+    </div>
+    <div class="card" style="padding:0.45em 0.8em; box-shadow: 0 2px 14px rgba(31,122,92,0.18);">
+      <div class="card-title" style="color:var(--accent);">function-claude</div>
+      <p>Appelle l'API Claude et renvoie une ressource OVHcloud prête à l'emploi à partir d'une description en langage naturel.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 15 – CLAUDE AI FUNCTION ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Claude AI</div>
+  <h2>La fonction Claude AI – une infra qui comprend l'intention</h2>
+  <div class="cols" style="align-items:start; gap:0.8em;">
+    <div>
+      <div style="font-size:0.58em; color:var(--accent); font-weight:700; margin-bottom:0.3em;">Le développeur écrit une description – pas des chiffres</div>
+      <div class="filepath">apps/ai-database-claim.yaml</div>
+      <pre><code class="language-yaml">spec:
+  parameters:
+    workloadDescription: >
+      E-commerce, ~800 utilisateurs
+      concurrents au pic (soldes
+      Tabaski). Haute disponibilité
+      requise.</code></pre>
+    </div>
+    <div>
+      <div class="code-label"><span class="dot dark"></span>Claude génère la ressource directement</div>
+      <pre><code class="language-yaml">kind: ProjectDatabase
+spec:
+  forProvider:
+    engine: postgresql
+    plan: production
+    flavor: b3-16
+    diskSize: 480
+    nodes:
+      - region: GRA
+      - region: GRA</code></pre>
+      <div class="callout" style="margin-top:0.3em;">
+        Pas de JSON, pas de patch – la sortie de Claude <em>est</em> la ressource. <code>diskSize</code> est calculé indépendamment du <code>plan</code>.
+      </div>
+    </div>
+  </div>
+  <div class="notebar" style="margin-top:0.3em;">
+    <b>function-claude</b> reçoit la description, appelle l'API Anthropic avec un system prompt qui contraint la sortie à du YAML valide pour un <b>ProjectDatabase</b> – pas d'étape de patch séparée.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 16 – DEMO 3 ═══════════════════════ -->
+<section>
+  <div class="demo-badge">Demo</div>
+  <h2>Le pipeline IA complet</h2>
+  <div class="cols" style="align-items:start;">
+    <div>
+      <div class="filepath">crossplane-functions/ai-composition.yaml</div>
+      <pre><code class="language-yaml">mode: Pipeline
+pipeline:
+  - step: ai-generate-resources
+    functionRef:
+      name: function-claude
+    input:
+      modelName: claude-sonnet-4-6
+      systemPrompt: |
+        Pèse : besoin de dispo, forme
+        du trafic, volumétrie/
+        croissance, impact si down.
+        3 tiers validés : discovery
+        (1 nœud) / production (2) /
+        advanced (3, zéro fenêtre
+        dégradée). diskSize calculé
+        indépendamment par plage.
+      userPrompt: |
+        Composite resource: {{ .Composite }}
+
+  - step: auto-ready
+    functionRef:
+      name: function-auto-ready</code></pre>
+    </div>
+    <div>
+      <div style="font-size:0.58em; color:var(--accent); font-weight:700; margin-bottom:0.3em;">Ce qu'il se passe quand vous appliquez ça</div>
+      <ul class="steps">
+        <li><div class="num-badge">1</div><div class="step-body"><strong>Crossplane valide le claim</strong><span>contre le XRD AIDatabase</span></div></li>
+        <li><div class="num-badge">2</div><div class="step-body"><strong>function-claude lit la description</strong><span>et appelle l'API Claude</span></div></li>
+        <li><div class="num-badge">3</div><div class="step-body"><strong>Claude renvoie une ressource complète</strong><span>dimensionnée pour le workload</span></div></li>
+        <li><div class="num-badge dark">4</div><div class="step-body"><strong>function-auto-ready la confirme</strong><span>OVHcloud la provisionne</span></div></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">
+    cat apps/ai-database-claim.yaml
+    kubectl apply -f apps/ai-database-claim.yaml
+    kubectl describe aidatabase shop-postgres
+  </aside>
+</section>
+
+<!-- ═══════════════════════ SLIDE 18 – FACE AUX ALTERNATIVES (FUSIONNÉE) ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Face aux alternatives</div>
+  <h2>Terraform et ArgoCD sont excellents – pour autre chose</h2>
+  <div class="cols" style="margin-top:0.5em;">
+    <div>
+      <div class="code-label"><span class="dot"></span>Crossplane vs Terraform</div>
+      <ul class="dotlist">
+        <li><span class="dot"></span><span class="txt"><b>Réconciliation continue</b> – Terraform réconcilie une fois. Crossplane, en continu.</span></li>
+        <li><span class="dot"></span><span class="txt"><b>200+ providers, une seule API</b> – un seul <code>kubectl</code> pour tout.</span></li>
+        <li><span class="dot"></span><span class="txt"><b>upjet génère ces providers</b> – à partir d'un provider Terraform existant, sans code Go à écrire à la main.</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="code-label"><span class="dot dark"></span>Flux vs ArgoCD</div>
+      <ul class="dotlist">
+        <li><span class="dot dark"></span><span class="txt"><b>Pull-only</b> – Flux n'a aucune API pour recevoir un déploiement. ArgoCD, si.</span></li>
+        <li><span class="dot dark"></span><span class="txt"><b>Fait pour Crossplane</b> – apps et Claims traités de façon identique.</span></li>
+        <li><span class="dot dark"></span><span class="txt"><b>Image Automation intégrée</b> – détecte les nouvelles images et met à jour Git tout seul. Chez ArgoCD, c'est un projet séparé (Argo Image Updater).</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:0.7em;">
+    <b>Terraform excelle en provisioning ponctuel, ArgoCD en confort d'UI.</b> Cette stack gagne dès qu'il faut de la réconciliation continue et zéro friction entre GitOps et infra.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 19 – ALLER PLUS LOIN (SCHÉMA) ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Pour aller plus loin</div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:0.22em; margin-top:0.4em;">
+
+    <div class="flow-box" style="width:56%; text-align:center; padding:0.3em 0.9em;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:0.5em;">
+        <img src="assets/logos/backstage.svg" style="height:1.3em;" alt="">
+        <strong>Portail développeur</strong>
+      </div>
+      <span>catalogue et formulaires, jamais de YAML brut</span>
+    </div>
+    <div style="font-size:0.55em; color:var(--muted); line-height:0.6;">↓</div>
+
+    <div class="flow-box" style="width:76%; text-align:center; padding:0.35em 0.9em; border:2px solid var(--accent); box-shadow:0 2px 14px rgba(31,122,92,0.22);">
+      <div style="display:flex; align-items:center; justify-content:center; gap:0.6em;">
+        <img src="assets/logos/flux.svg" style="height:1.4em;" alt="">
+        <img src="assets/logos/crossplane.svg" style="height:1.4em;" alt="">
+        <strong style="color:var(--accent);">API Kubernetes – control plane universel</strong>
+      </div>
+      <span>ce qu'on vient de voir en direct</span>
+    </div>
+
+    <div style="display:flex; gap:0.4em; width:76%; justify-content:center; margin-top:0.05em;">
+      <div class="flow-box" style="flex:1; font-size:0.8em; padding:0.25em 0.5em; text-align:center;">
+        <div style="display:flex; justify-content:center; gap:0.3em;"><img src="assets/logos/kyverno.svg" style="height:1.1em;" alt=""><img src="assets/logos/opa.svg" style="height:1.1em;" alt=""></div>
+        <strong>Garde-fous</strong><span>+ ManagementPolicies natifs</span>
+      </div>
+      <div class="flow-box" style="flex:1; font-size:0.8em; padding:0.25em 0.5em; text-align:center;">
+        <div style="display:flex; justify-content:center;"><img src="assets/logos/eso.svg" style="height:1.1em;" alt=""></div>
+        <strong>Secrets</strong>
+      </div>
+      <div class="flow-box" style="flex:1; font-size:0.8em; padding:0.25em 0.5em; text-align:center;">
+        <div style="display:flex; justify-content:center; gap:0.3em;"><img src="assets/logos/prometheus.svg" style="height:1.1em;" alt=""><img src="assets/logos/grafana.svg" style="height:1.1em;" alt=""></div>
+        <strong>Observabilité</strong>
+      </div>
+    </div>
+
+    <div style="font-size:0.55em; color:var(--muted); line-height:0.6;">↓</div>
+    <div class="flow-box" style="width:60%; text-align:center; padding:0.3em 0.9em;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:0.5em; margin-bottom:0.1em;">
+        <img src="assets/logos/ovh.svg" style="height:1.2em;" alt="">
+        <img src="assets/logos/googlecloud.svg" style="height:1.2em;" alt="">
+        <img src="assets/logos/aws.svg" style="height:1em;" alt="">
+        <img src="assets/logos/github.svg" style="height:1.2em;" alt="">
+      </div>
+      <strong>Providers cloud</strong><span>n'importe quelle API</span>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:0.3em; padding:0.5em 1.1em;">
+    <b>La fondation ne change pas.</b> Ces briques s'ajoutent une par une, sans remise en cause.
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 20 – MESSAGES CLÉS ═══════════════════════ -->
+<section>
+  <div class="eyebrow">Pour finir</div>
+  <h2>Messages clés</h2>
+  <div class="cards cards-2" style="margin-top:0.5em;">
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge">1</div>
+        <div>
+          <div class="card-title">Git est votre control plane</div>
+          <p>Si ce n'est pas dans Git, ça n'existe pas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge">2</div>
+        <div>
+          <div class="card-title">API universelle pour l'infra</div>
+          <p>Un seul outil, n'importe quel cloud.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge dark">3</div>
+        <div>
+          <div class="card-title">La réconciliation est le superpouvoir</div>
+          <p>Pas seulement du provisioning – de l'enforcement continu.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; gap:0.6em; align-items:flex-start;">
+        <div class="num-badge dark">4</div>
+        <div>
+          <div class="card-title">Les Functions rendent l'infra programmable</div>
+          <p>De la logique, pas juste du YAML.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SLIDE 21 – Q&A ═══════════════════════ -->
+<section class="title-slide">
+  <div class="eyebrow" style="text-align:center;">Merci</div>
+  <h1 style="font-size:1.6em;">Des questions ?</h1>
+  <div class="stackline" style="margin-top:0.8em;">github.com/fallmor/gitops-selfservice</div>
+  <div class="stackline" style="margin-top:0.6em;"><b>Mor Fall</b> · OVHcloud</div>
+  <div class="stackline">Stack : Flux CD · Crossplane · OVHcloud Provider</div>
+  <aside class="notes">
+    Q : Pourquoi pas Terraform ?
+    R : Terraform s'exécute une fois (plan/apply). Crossplane réconcilie pour toujours. Il vit aussi dans Kubernetes, donc RBAC/audit logs/GitOps viennent gratuitement.
+
+    Q : Et si Claude donne une mauvaise recommandation ?
+    R : Ça dépend du chemin. Pour la Composition classique (Demo 1&2), le XRD contraint via enum ce qu'un développeur peut écrire – c'est borné avant même que la ressource existe. Pour le pipeline IA, function-claude génère la ressource complète ; le seul garde-fou aujourd'hui est le system prompt, qui limite les combinaisons (plan, flavor, nodes) valides. En prod, on ajouterait une validation de schéma après génération, ou un policy engine (Kyverno/OPA) avant d'appliquer quoi que ce soit venant du LLM.
+
+    Q : C'est production-ready ?
+    R : Le pattern est réel et utilisé en production. Le package function-claude montré ici est une démo – une vraie équipe le durcirait (validation, limites de coût, tests) avant de le déployer largement.
+
+    Q : Pourquoi Crossplane et pas un Operator Kubernetes fait maison ? Il peut faire pratiquement la même chose.
+    R : Vrai, techniquement. Les providers Crossplane SONT des Operators. La différence : qui écrit et maintient ce contrôleur. Un Operator maison, c'est du code Go par type de ressource à maintenir ; Crossplane fournit déjà l'Operator générique par ressource – l'équipe plateforme écrit une Composition en YAML, pas un contrôleur en Go. Et la séparation Claim/XRD/Composition donne le self-service et la recomposition multi-ressources en prime.
+
+    Q : Quelles autres ressources Crossplane peut gérer ?
+    R : Tout ce qui a une API : S3, VMs, DNS, certificats TLS, repos GitHub, topics Kafka, monitors Datadog... s'il y a un provider, Crossplane peut le gérer.
+  </aside>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="vendor/reveal/reveal.js"></script>
+<script src="vendor/reveal/plugin/highlight/highlight.js"></script>
+<script src="vendor/reveal/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c',
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    controls: true,
+    progress: false,
+    center: false,
+    width: 1200,
+    height: 820,
+    margin: 0.04,
+    plugins: [RevealHighlight, RevealNotes],
+    highlight: { highlightOnLoad: true }
+  });
+</script>
+</body>
+</html>
